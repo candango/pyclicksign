@@ -1,1 +1,3 @@
-cartola==0.13
+filemagic==1.6
+firenado==0.2.13
+peasant==0.4
