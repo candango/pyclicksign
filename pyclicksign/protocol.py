@@ -25,10 +25,8 @@ from peasant import get_version as peasant_get_version
 from peasant.client import AsyncPeasant, PeasantTransport
 from tornado import version
 from tornado import escape
-from tornado.httputil import urlencode
 from tornado.httpclient import AsyncHTTPClient, HTTPClientError, HTTPResponse
 from uuid import uuid4
-from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
