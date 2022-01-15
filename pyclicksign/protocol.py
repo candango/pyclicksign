@@ -161,32 +161,39 @@ class ClicksignPeasant(AsyncPeasant):
         return await self.transport.get(directory['account_test'])
 
     async def upload_file(self, **kwargs) -> HTTPResponse:
+        local_path = kwargs.get("local_path")
+        if not local_path:
+            raise HTTPClientError(400, "É necessário informar o path do "
+                                       "arquivo que será processado "
+                                       "localmente.")
         path = kwargs.get("path")
-        file_path = kwargs.get("file_path")
+        deadline = kwargs.get("deadline")
+        if not deadline:
+            raise HTTPClientError(400, "É necessário informar o parâmetro "
+                                       "deadline. Esta é a data limite para a "
+                                       "assinatura do contrato por parte de "
+                                       "todos os signatários.")
         mime = None
         file_base46 = None
         document_data = {
             'document': {
                 'path': "/%s",
                 'content_base64': "data:%s;base64,%s",
-                'deadline_at': "%s-03:00",
+                'deadline_at': "%s",
                 'auto_close': True,
                 'locale': "pt-BR",
                 'sequence_enabled': False
             }
         }
 
-        if os.path.exists(file_path):
+        if os.path.exists(local_path):
             with magic.Magic(flags=magic.MAGIC_MIME_TYPE) as m:
-                mime = m.id_filename(file_path)
-
-            file_base46 = base64.b64encode(fs.read(file_path, True))
+                mime = m.id_filename(local_path)
+            file_base46 = base64.b64encode(fs.read(local_path, True))
         document_data['document']['content_base64'] = "data:%s;base64,%s" % (
             mime, file_base46.decode())
         document_data['document']['path'] = "/%s.pdf" % uuid4()
-        document_data['document']['deadline_at'] = "%s-03:00" % (
-                datetime.now() + timedelta(days=1)
-        ).strftime("%Y-%m-%dT%H:%M:%S")
+        document_data['document']['deadline_at'] = "%s-03:00" % deadline
         directory = await self.directory()
         headers = {'Content-Type': "application/json"}
         return await self.transport.post(

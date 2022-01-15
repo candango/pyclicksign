@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Flavio Gonçalves Garcia
+# Copyright 2021-2022 Flavio Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Feature: Criar um documento para assinatura
+Feature: Gerar um hash para assinatura via api
   # Used to point service url's based on resource and action
 
-  Scenario: Criar documento via upload
+  Scenario: Mostrar o diretorio com os métodos da api
 
-    Given Endereço do arquivo sample_pdf_file existe em sandbox/sample-pdf-file.pdf
-    When Enviamos arquivo sample_pdf_file por upload
-    Then Resposta do envio por upload é valida
+    Given um documento
+    When Nós requistamos o método de diretório
+    Then A resposta do método de diretório será válida
