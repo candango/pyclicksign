@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Flavio Gonçalves Garcia
+# Copyright 2021-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ Feature: Criar um documento para assinatura
 
   Scenario: Criar documento via upload
 
-    Given Endereço do arquivo sample_pdf_file existe em sandbox/sample-pdf-file.pdf
+    Given Arquivo de sample_pdf_file existe em sandbox/sample-pdf-file.pdf
     When Enviamos arquivo sample_pdf_file por upload
     Then Resposta do envio por upload é valida
+      And Podemos converter documento_valido de dict para texto
+      And Arquivo de documento_valido é criado com sucesso em sandbox/documento_valido.txt

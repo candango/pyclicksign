@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Flavio Gonçalves Garcia
+# Copyright 2021-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 from behave import given, when, then, step
 from cartola import fs
+from tornado.escape import json_encode, json_decode
 import os
 
 
@@ -30,27 +31,43 @@ def create_file(path, content, binary=False):
     return real_path
 
 
-@when("File is created at {path}")
-def step_file_create_at(context, path):
-    real_directory = get_absolute_path(path)
-    context.tester.assertTrue(os.path.isdir(real_directory))
-    context.tester.assertTrue(os.access(real_directory, os.W_OK))
+@then("Podemos converter {index} de dict para texto")
+def step_arquivo_criado_com_sucesso(context, index):
+    data = getattr(context, index)
+    setattr(context, index, json_encode(data))
 
 
-@given("File for {index} exists at {path}")
-def step_file_for_exists_at(context, index, path):
-    real_account_path = get_absolute_path(path)
-    context.tester.assertTrue(os.path.exists(real_account_path))
-    context.tester.assertTrue(os.path.isfile(real_account_path))
-    setattr(context, index, fs.read(real_account_path))
+@then("Podemos converter {index} de texto para dict")
+def step_arquivo_criado_com_sucesso(context, index):
+    data = getattr(context, index)
+    setattr(context, index, json_decode(data))
 
 
-@given("Endereço do arquivo {file_index} existe em {path}")
-def step_file_for_exists_at(context, file_index, path):
-    real_file_path = get_absolute_path(path)
-    context.tester.assertTrue(os.path.exists(real_file_path))
-    context.tester.assertTrue(os.path.isfile(real_file_path))
-    setattr(context, file_index, real_file_path)
+@then("Arquivo de {index} é criado com sucesso em {path}")
+def step_arquivo_criado_com_sucesso(context, index, path):
+    data = getattr(context, index)
+    if isinstance(data, dict):
+        data = json_encode(data)
+    if isinstance(data, str):
+        data = data.encode()
+    real_path = create_file(path, data, True)
+    context.tester.assertTrue(os.path.exists(real_path))
+    context.tester.assertTrue(os.path.isfile(real_path))
+
+
+@given("Arquivo de {index} existe em {path}")
+def step_arquivo_existe(context, index, path):
+    real_path = get_absolute_path(path)
+    context.tester.assertTrue(os.path.exists(real_path))
+    context.tester.assertTrue(os.path.isfile(real_path))
+    setattr(context, index, real_path)
+    print(getattr(context, index))
+
+
+@given("Ler dados de {index} sucedeu")
+def step_arquivo_existe(context, index):
+    real_path = getattr(context, index)
+    setattr(context, index, fs.read(real_path))
 
 
 @then("File at {path} removed")

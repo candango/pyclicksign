@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Flavio Gonçalves Garcia
+# Copyright 2021-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,22 +31,20 @@ async def step_enviamos_arquivo_por_upload(context, file_index):
     context.upload_result = None
     try:
         result = await context.protocol.upload_file(
-            local_path=context.local_path,
+            context.local_path,
             deadline=context.deadline
         )
-        context.upload_result = escape.json_decode(result.body)
-        print(context.upload_result)
+        context.documento_valido = escape.json_decode(result.body)
     except HTTPError as e:
         print(e)
         logger.error(e)
     except Exception as e:
         print(e)
         logger.error(e)
-    context.tester.assertTrue(context.upload_result)
+    context.tester.assertTrue(context.documento_valido)
 
 
 @then("Resposta do envio por upload é valida")
 def step_resposta_envio_por_upload_valida(context):
-    context.tester.assertTrue(context.upload_result)
-    context.tester.assertEqual(context.deadline, context.upload_result[
+    context.tester.assertEqual(context.deadline, context.documento_valido[
         'document']['deadline_at'][:-10])
