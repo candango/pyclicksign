@@ -17,6 +17,7 @@ from .sign import hmac_sha256_hash
 import base64
 from cartola import fs
 import copy
+from datetime import datetime, timedelta
 from firenado import get_version as firenado_get_version
 from firenado.tornadoweb import get_request
 import logging
@@ -58,7 +59,6 @@ class ClicksignApiTransport(PeasantTransport):
     async def get(self, path, **kwargs) -> HTTPResponse:
         headers = kwargs.get('headers')
         request = get_request(path)
-        print(path)
         if headers:
             request.headers.update(headers)
         return await self._client.fetch(request)
@@ -180,14 +180,10 @@ class ClicksignPeasant(AsyncPeasant):
                                        "local que será enviado para a"
                                        "ClickSign.")
         path = kwargs.get("path")
-        deadline = kwargs.get("deadline")
-        if not deadline:
-            raise HTTPClientError(400, "É necessário informar o parâmetro "
-                                       "deadline. Esta é a data limite para a "
-                                       "assinatura do contrato por parte de "
-                                       "todos os signatários.")
-        mime = None
-        file_base46 = None
+        deadline = kwargs.get("deadline", (
+                datetime.now() + timedelta(days=30)
+        ).strftime("%Y-%m-%dT%H:%M:%S"))
+
         document_data = {
             'document': {
                 'path': "/%s",
@@ -199,6 +195,8 @@ class ClicksignPeasant(AsyncPeasant):
             }
         }
 
+        mime = None
+        file_base46 = None
         if os.path.exists(filename):
             with magic.Magic(flags=magic.MAGIC_MIME_TYPE) as m:
                 mime = m.id_filename(filename)
