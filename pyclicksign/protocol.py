@@ -119,42 +119,6 @@ class ClicksignApiTransport(PeasantTransport):
             )
         }
 
-    async def new_nonce(self):
-        url = (await self.peasant.directory())['security']['newNonce']
-        response = await self.head(url)
-        return response.headers.get("Replay-Nonce")
-
-    async def user_auth(self, **kwargs):
-        headers = kwargs.get("headers", {})
-        headers['nonce'] = await self.new_nonce()
-        url = (await self.peasant.directory())['security']['userAuth']
-        form_data = kwargs.get("form_data", {})
-        response = await self.post(url, form_data=form_data, headers=headers)
-        return response
-
-    async def knock(self, **kwargs):
-        headers = kwargs.get("headers", {})
-        headers['nonce'] = await self.new_nonce()
-        url = (await self.peasant.directory())['peasant']['knock']
-        response = await self.head(url, headers=headers)
-        return response
-
-    async def register(self, **kwargs):
-        headers = kwargs.get("headers", {})
-        form_data = kwargs.get("form_data", {})
-        headers['nonce'] = await self.new_nonce()
-        url = (await self.peasant.directory())['peasant']['register']
-        response = await self.post(url, form_data=form_data, headers=headers)
-        return response
-
-    async def device_ping(self, payload, **kwargs):
-        headers = kwargs.get("headers", {})
-        form_data = {'payload': kwargs.get("form_data", payload)}
-        headers['nonce'] = await self.new_nonce()
-        url = (await self.peasant.directory())['device']['ping']
-        response = await self.post(url, form_data=form_data, headers=headers)
-        return response
-
 
 class ClicksignPeasant(AsyncPeasant):
 
