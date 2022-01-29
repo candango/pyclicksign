@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cartola import dt
+from datetime import datetime
 from behave import given, when, then, step
 from behave.api.async_step import async_run_until_complete
 from tornado.httpclient import HTTPError
@@ -42,6 +44,9 @@ async def step_enviamos_arquivo_por_upload(context, file_index):
 
 @then("Resposta do envio por upload é valida")
 def step_resposta_envio_por_upload_valida(context):
-    print(context.documento_valido)
-    context.tester.assertEqual(context.deadline, context.documento_valido[
-        'document']['deadline_at'][:-10])
+    deadline = datetime.strptime(
+        context.documento_valido['document']['deadline_at'].split("T")[0],
+        "%Y-%m-%d")
+    date_diff = deadline - datetime.now()
+    # Verificando se "mais ou menos" 30 dias foram adicionados
+    context.tester.assertTrue(date_diff.days >= 29)

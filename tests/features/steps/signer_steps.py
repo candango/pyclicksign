@@ -14,7 +14,6 @@
 
 from behave import given, when, then, step
 from behave.api.async_step import async_run_until_complete
-from datetime import datetime, timedelta
 from tornado.httpclient import HTTPError
 from tornado import escape
 import logging
