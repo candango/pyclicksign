@@ -14,7 +14,6 @@
 
 from behave import given, when, then, step
 from behave.api.async_step import async_run_until_complete
-from datetime import datetime, timedelta
 from tornado.httpclient import HTTPError
 from tornado import escape
 import logging
@@ -26,13 +25,10 @@ logger = logging.getLogger(__name__)
 @async_run_until_complete
 async def step_enviamos_arquivo_por_upload(context, file_index):
     context.local_path = getattr(context, file_index)
-    context.deadline = (datetime.now() + timedelta(days=1)).strftime(
-        "%Y-%m-%dT%H:%M:%S")
     context.upload_result = None
     try:
         result = await context.protocol.upload_file(
-            context.local_path,
-            deadline=context.deadline
+            context.local_path
         )
         context.documento_valido = escape.json_decode(result.body)
     except HTTPError as e:
@@ -46,5 +42,6 @@ async def step_enviamos_arquivo_por_upload(context, file_index):
 
 @then("Resposta do envio por upload é valida")
 def step_resposta_envio_por_upload_valida(context):
+    print(context.documento_valido)
     context.tester.assertEqual(context.deadline, context.documento_valido[
         'document']['deadline_at'][:-10])
