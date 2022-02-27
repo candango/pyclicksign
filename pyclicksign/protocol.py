@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright 2021-2022 Flávio Gonçalves Garcia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,10 +126,6 @@ class ClicksignPeasant(AsyncPeasant):
 
     def __init__(self, transport: ClicksignApiTransport):
         super(ClicksignPeasant, self).__init__(transport)
-
-    @property
-    def component(self):
-        return self._component
 
     @property
     def user_agent(self):
@@ -300,8 +298,6 @@ class ClicksignPeasant(AsyncPeasant):
             raise HTTPClientError(400, "É necessário informar segredo("
                                        "parâmetro secret) para assinar um "
                                        "documento.")
-
-
 
         list_data = {
             'request_signature_key': request_signature_key,
