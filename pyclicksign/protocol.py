@@ -106,17 +106,32 @@ class ClicksignApiTransport(PeasantTransport):
             ),
             "create_signer": "%s/%s?access_token=%s" % (
                 self._bastion_address,
-                "/api/v1/signers",
+                "api/v1/signers",
                 self._access_token
             ),
             "create_list": "%s/%s?access_token=%s" % (
                 self._bastion_address,
-                "/api/v1/lists",
+                "api/v1/lists",
+                self._access_token
+            ),
+            "notify_by_email": "%s/%s?access_token=%s" % (
+                self._bastion_address,
+                "api/v1/notifications",
+                self._access_token
+            ),
+            "notify_by_whatsapp": "%s/%s?access_token=%s" % (
+                self._bastion_address,
+                "api/v1/notify_by_whatsapp",
+                self._access_token
+            ),
+            "notify_by_sms": "%s/%s?access_token=%s" % (
+                self._bastion_address,
+                "api/v1/notify_by_sms",
                 self._access_token
             ),
             "sign": "%s/%s?access_token=%s" % (
                 self._bastion_address,
-                "/api/v1/sign",
+                "api/v1/sign",
                 self._access_token
             )
         }
@@ -203,7 +218,7 @@ class ClicksignPeasant(AsyncPeasant):
                                        "de autenticação(parâmetro auth) "
                                        "contiverem sms e/ou whatsapp.")
 
-        has_documentation = kwargs.get("has_documentation", False)
+        has_documentation = kwargs.get("has_documentation", True)
         selfie_enabled = kwargs.get("selfie_enabled", False)
         handwritten_enabled = kwargs.get("handwritten_enabled", False)
         official_document_enabled = kwargs.get(
@@ -286,6 +301,61 @@ class ClicksignPeasant(AsyncPeasant):
         return await self.transport.post(
             directory['create_list'], headers=headers,
             form_data=list_data)
+
+    async def notify_by_email(self, request_signature_key,
+                              **kwargs) -> HTTPResponse:
+
+        if not request_signature_key:
+            raise HTTPClientError(400, "É necessário informar a chave da "
+                                       "requisição da assinatura("
+                                       "request_signature_key) para solicitar"
+                                       "a assinatura de um documento.")
+        message = kwargs.get("message", None)
+        url = kwargs.get("url", None)
+
+        notification_data = {
+            'request_signature_key': request_signature_key,
+            'message': message,
+            'url': url
+        }
+        directory = await self.directory()
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        return await self.transport.post(
+            directory['notify_by_email'], headers=headers,
+            form_data=notification_data)
+
+    async def notify_by_whatsapp(self, request_signature_key) -> HTTPResponse:
+        if not request_signature_key:
+            raise HTTPClientError(400, "É necessário informar a chave da "
+                                       "requisição da assinatura("
+                                       "request_signature_key) para solicitar"
+                                       "a assinatura de um documento.")
+        notification_data = {
+            'request_signature_key': request_signature_key
+        }
+        directory = await self.directory()
+        headers = {'Content-Type': "application/json"}
+        return await self.transport.post(
+            directory['notify_by_whatsapp'], headers=headers,
+            form_data=notification_data)
+
+    async def notify_by_sms(self, request_signature_key) -> HTTPResponse:
+        if not request_signature_key:
+            raise HTTPClientError(400, "É necessário informar a chave da "
+                                       "requisição da assinatura("
+                                       "request_signature_key) para solicitar"
+                                       "a assinatura de um documento.")
+        notification_data = {
+            'request_signature_key': request_signature_key
+        }
+        directory = await self.directory()
+        headers = {'Content-Type': "application/json"}
+        return await self.transport.post(
+            directory['notify_by_sms'], headers=headers,
+            form_data=notification_data)
 
     async def sign(self, request_signature_key, secret,
                    **kwargs) -> HTTPResponse:

@@ -32,3 +32,4 @@ Feature: Adicionando signatários a um documento existente
       And Arquivo de signatarios existe em sandbox/signatarios.txt
       And Ler dados de signatarios sucedeu
     When Adicionamos signatários ao documento válido
+      And Solicitamos assinaturas dos signatarios por email
