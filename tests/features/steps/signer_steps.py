@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 @when("Cadastramos signatario com nome {nome} e email {email}")
 @async_run_until_complete
-async def step_enviamos_arquivo_por_upload(context, nome, email):
+async def step_cadastramos_signatario_nome_email(context, nome, email):
     context.signatarios = getattr(context, "signatarios", [])
     signatario_criado = False
     try:
@@ -49,7 +49,7 @@ async def step_enviamos_arquivo_por_upload(context, nome, email):
 
 @when("Adicionamos signatários ao documento válido")
 @async_run_until_complete
-async def step_enviamos_arquivo_por_upload(context):
+async def step_adicionamos_signatario_documento_valido(context):
     documento = escape.json_decode(context.documento_valido)
     signatarios = escape.json_decode(context.signatarios)
     context.lists = []

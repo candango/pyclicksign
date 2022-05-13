@@ -99,11 +99,6 @@ class ClicksignApiTransport(PeasantTransport):
                 "api/v1/accounts",
                 self._access_token
             ),
-            "upload_document": "%s/%s?access_token=%s" % (
-                self._bastion_address,
-                "api/v1/documents",
-                self._access_token
-            ),
             "create_signer": "%s/%s?access_token=%s" % (
                 self._bastion_address,
                 "api/v1/signers",
@@ -133,7 +128,22 @@ class ClicksignApiTransport(PeasantTransport):
                 self._bastion_address,
                 "api/v1/sign",
                 self._access_token
-            )
+            ),
+            "read_document": "%s/%s/{0}?access_token=%s" % (
+                self._bastion_address,
+                "api/v1/documents",
+                self._access_token
+            ),
+            "read_documents": "%s/%s?{0}&access_token=%s" % (
+                self._bastion_address,
+                "api/v1/documents",
+                self._access_token
+            ),
+            "upload_document": "%s/%s?access_token=%s" % (
+                self._bastion_address,
+                "api/v1/documents",
+                self._access_token
+            ),
         }
 
 
@@ -380,3 +390,15 @@ class ClicksignPeasant(AsyncPeasant):
         return await self.transport.post(
             directory['sign'], headers=headers,
             form_data=list_data)
+
+    async def read_document(self, document_key, **kwargs) -> HTTPResponse:
+        if not document_key:
+            raise HTTPClientError(400, "É necessário informar a chave do "
+                                       "documento a ser lido(document_key).")
+        directory = await self.directory()
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        return await self.transport.get(
+            directory['read_document'].format(document_key), headers=headers)

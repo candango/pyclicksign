@@ -42,6 +42,24 @@ async def step_enviamos_arquivo_por_upload(context, file_index):
     context.tester.assertTrue(context.documento_valido)
 
 
+@when("Visualizamos o documento válido")
+@async_run_until_complete
+async def step_visualizamos_documento_enviado_por_upload(context):
+    documento = escape.json_decode(context.documento_valido)
+    try:
+        result = await context.protocol.read_document(
+            documento['document']['key']
+        )
+        context.documento_lido = escape.json_decode(result.body)
+    except HTTPError as e:
+        print(e)
+        logger.error(e)
+    except Exception as e:
+        print(e)
+        logger.error(e)
+    context.tester.assertTrue(context.documento_lido)
+
+
 @then("Resposta do envio por upload é valida")
 def step_resposta_envio_por_upload_valida(context):
     deadline = datetime.strptime(
@@ -50,3 +68,11 @@ def step_resposta_envio_por_upload_valida(context):
     date_diff = deadline - datetime.now()
     # Verificando se "mais ou menos" 30 dias foram adicionados
     context.tester.assertTrue(date_diff.days >= 29)
+
+
+@then("Resposta da visualização do documento é valida")
+def step_resposta_envio_por_upload_valida(context):
+    documento = escape.json_decode(context.documento_valido)
+    # Verificando se "mais ou menos" 30 dias foram adicionados
+    context.tester.assertEqual(context.documento_lido['document']['key'],
+                               documento['document']['key'])

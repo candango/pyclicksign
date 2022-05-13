@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Feature: Criar um documento para assinatura
+Feature: Criar e visualizar um documento
   # Used to point service url's based on resource and action
 
   Scenario: Criar documento via upload
@@ -22,3 +22,10 @@ Feature: Criar um documento para assinatura
     Then Resposta do envio por upload é valida
       And Podemos converter documento_valido de dict para texto
       And Arquivo de documento_valido é criado com sucesso em sandbox/documento_valido.txt
+
+  Scenario: Visualizar documento
+
+    Given Arquivo de documento_valido existe em sandbox/documento_valido.txt
+      And Ler dados de documento_valido sucedeu
+    When Visualizamos o documento válido
+    Then Resposta da visualização do documento é valida
